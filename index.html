@@ -186,7 +186,7 @@ async function fetchVoices(){
 async function genAudio(text){
   var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+S.voiceId+'?output_format=mp3_44100_128',{
     method:'POST',headers:{'xi-api-key':S.apiKey,'Content-Type':'application/json'},
-    body:JSON.stringify({text:text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.75},speed:S.speed})
+    body:JSON.stringify({text:text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.75}})
   });
   if(!res.ok)throw new Error('API error: '+res.status);
   return URL.createObjectURL(await res.blob());
@@ -204,6 +204,7 @@ async function playChunk(idx){
   audioEl.src=url;
   audioEl.onended=function(){if(S.mode==='reading')playChunk(idx+1);};
   audioEl.onerror=function(){if(S.mode==='reading')playChunk(idx+1);};
+  audioEl.playbackRate=S.speed;
   try{await audioEl.play();}catch(e){console.warn('play blocked',e);}
 }
 
