@@ -6,172 +6,447 @@
 <title>Farewell2Arms</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
---bg:#fafaf8;--bg2:#f0efec;--bg3:#e8e7e3;
---tx:#1a1a19;--tx2:#6b6a65;--tx3:#9c9b95;
---acc:#1d9e75;--acc2:#e1f5ee;--acct:#085041;
---rec:#d85a30;--rec2:#faece7;--rect:#712b13;
---info:#378add;--info2:#e6f1fb;--infot:#0c447c;
---bdr:#d3d1c7;--bdr2:#b4b2a9;
---rad:10px;--rad2:14px;
-}
-@media(prefers-color-scheme:dark){:root{
---bg:#1c1c1a;--bg2:#2a2a27;--bg3:#353532;
---tx:#e8e7e3;--tx2:#9c9b95;--tx3:#6b6a65;
---acc:#5dcaa5;--acc2:#04342c;--acct:#9fe1cb;
---rec:#f0997b;--rec2:#4a1b0c;--rect:#f5c4b3;
---info:#85b7eb;--info2:#042c53;--infot:#b5d4f4;
---bdr:#444441;--bdr2:#5f5e5a;
-}}
+:root{--bg:#fafaf8;--bg2:#f0efec;--bg3:#e8e7e3;--tx:#1a1a19;--tx2:#6b6a65;--tx3:#9c9b95;--acc:#1d9e75;--acc2:#e1f5ee;--acct:#085041;--rec:#d85a30;--rec2:#faece7;--rect:#712b13;--info:#378add;--infot:#0c447c;--bdr:#d3d1c7;--bdr2:#b4b2a9;--hi:#fff8c5;--rad:10px;--rad2:14px}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#2a2a27;--bg3:#353532;--tx:#e8e7e3;--tx2:#9c9b95;--tx3:#6b6a65;--acc:#5dcaa5;--acc2:#04342c;--acct:#9fe1cb;--rec:#f0997b;--rec2:#4a1b0c;--rect:#f5c4b3;--info:#85b7eb;--infot:#b5d4f4;--bdr:#444441;--bdr2:#5f5e5a;--hi:#3d3a20}}
 body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100dvh;display:flex;flex-direction:column;-webkit-text-size-adjust:100%}
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--bdr)}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--bdr);position:sticky;top:0;background:var(--bg);z-index:10}
 .header h1{font-size:17px;font-weight:600;letter-spacing:-0.3px}
-.header .badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--acc2);color:var(--acct)}
-.header .settings-btn{width:36px;height:36px;border:none;background:none;color:var(--tx2);font-size:20px;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center}
-.header .settings-btn:active{background:var(--bg2)}
-.progress-bar{height:3px;background:var(--bg2)}
-.progress-fill{height:100%;transition:width 0.4s ease,background 0.3s;border-radius:0 2px 2px 0}
-.main{flex:1;padding:16px;padding-bottom:140px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--acc2);color:var(--acct)}
+.settings-btn{width:36px;height:36px;border:none;background:none;color:var(--tx2);font-size:20px;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.progress-bar{height:3px;background:var(--bg2);position:sticky;top:49px;z-index:9}
+.progress-fill{height:100%;transition:width 0.4s ease;border-radius:0 2px 2px 0;background:var(--acc)}
+.main{flex:1;padding:16px;padding-bottom:180px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .panel{display:none;flex-direction:column;gap:16px}
 .panel.active{display:flex}
 textarea{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:14px;font-size:15px;line-height:1.65;background:var(--bg);color:var(--tx);resize:vertical;font-family:inherit;min-height:200px}
 textarea:focus{outline:none;border-color:var(--bdr2)}
 input[type=text],input[type=password]{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;font-size:15px;background:var(--bg);color:var(--tx);font-family:inherit}
 input:focus{outline:none;border-color:var(--bdr2)}
-select{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;font-size:15px;background:var(--bg);color:var(--tx);font-family:inherit;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239c9b95' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;font-size:15px;background:var(--bg);color:var(--tx);font-family:inherit;-webkit-appearance:none;appearance:none}
 .label{font-size:13px;color:var(--tx2);margin-bottom:4px}
 .hint{font-size:12px;color:var(--tx3)}
 .meta{font-size:13px;color:var(--tx3)}
+/* DOC VIEW */
+.doc-view{display:flex;flex-direction:column;gap:2px}
+.doc-chunk{padding:10px 12px;border-radius:8px;font-size:14px;line-height:1.65;color:var(--tx2);cursor:pointer;transition:background 0.2s,color 0.2s;border-left:3px solid transparent}
+.doc-chunk:active{opacity:0.7}
+.doc-chunk.current{background:var(--hi);color:var(--tx);border-left-color:var(--acc);font-weight:400}
+.doc-chunk.played{color:var(--tx3);border-left-color:var(--bg3)}
+.doc-chunk.heading{font-weight:600;font-size:15px;color:var(--tx);margin-top:8px}
+.doc-chunk.heading.played{color:var(--tx2)}
+.chunk-idx{font-size:10px;color:var(--tx3);margin-right:6px;opacity:0.5}
+/* NOTING */
 .context-box{background:var(--bg2);border-radius:var(--rad);padding:14px;font-size:14px;line-height:1.65;color:var(--tx);border-left:3px solid var(--bdr2)}
 .context-label{font-size:11px;color:var(--tx3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
 .search-anchor{font-size:14px;color:var(--infot);padding:6px 0;cursor:pointer}
-.status-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:260px;text-align:center}
-.pulse-ring{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:pulse 2s ease infinite}
-.pulse-ring.green{background:var(--acc2)}
+.live-text{min-height:60px;font-size:14px;line-height:1.6}
+/* NOTES */
 .note-card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rad2);padding:14px}
 .note-num{font-size:11px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
 .note-search{font-size:13px;color:var(--infot);margin:6px 0}
 .note-text{font-size:14px;line-height:1.6;color:var(--tx)}
 .note-del{border:none;background:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:4px;float:right;line-height:1}
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:var(--bg);border-top:0.5px solid var(--bdr)}
-.btn{width:100%;padding:16px;font-size:16px;font-weight:500;border:none;border-radius:var(--rad2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform 0.1s}
+/* BOTTOM */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:var(--bg);border-top:0.5px solid var(--bdr);z-index:10}
+.btn{width:100%;padding:14px;font-size:16px;font-weight:500;border:none;border-radius:var(--rad2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform 0.1s}
 .btn:active{transform:scale(0.97)}
 .btn-primary{background:var(--acc);color:#fff}
-.btn-primary:disabled{opacity:0.4;cursor:default}
+.btn-primary:disabled{opacity:0.4}
 .btn-record{background:var(--rec);color:#fff}
 .btn-outline{background:transparent;border:0.5px solid var(--bdr);color:var(--tx)}
 .btn-save{background:var(--acc);color:#fff}
+.btn-sm{padding:10px 12px;font-size:14px}
 .btn-row{display:flex;gap:8px}
 .btn-row .btn{flex:1}
-.loading-dots::after{content:'';animation:dots 1.5s steps(4) infinite}
-@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.55;transform:scale(0.95)}}
-.live-text{min-height:60px;font-size:14px;line-height:1.6;color:var(--tx);font-style:italic}
+.nav-row{display:flex;gap:6px;margin-bottom:8px}
+.nav-row .btn{flex:1;padding:10px;font-size:13px}
 .speed-control{display:flex;align-items:center;gap:10px;padding:8px 0}
 .speed-control label{font-size:13px;color:var(--tx2);white-space:nowrap}
 .speed-control input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--bdr);border-radius:2px;outline:none}
-.speed-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--acc);cursor:pointer}
-.speed-val{font-size:13px;color:var(--tx2);min-width:30px;text-align:right}
+.speed-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer}
+.speed-val{font-size:13px;color:var(--tx2);min-width:36px;text-align:right}
+.mic-dot{width:12px;height:12px;border-radius:50%;background:var(--rec);animation:pulse 1.2s infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.9)}}
+.loading-dots::after{content:'';animation:dots 1.5s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.voice-status{position:fixed;top:56px;left:0;right:0;text-align:center;font-size:11px;color:var(--acc);padding:4px;background:var(--acc2);z-index:8;display:none}
 </style>
 </head>
 <body>
 <div class="header">
   <h1>Farewell2Arms</h1>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span class="badge" id="noteCount" style="display:none">0 notes</span>
+  <div class="hdr-right">
+    <span class="badge" id="noteCount" style="display:none">0</span>
     <span class="meta" id="progressPct" style="display:none">0%</span>
-    <button class="settings-btn" onclick="showPanel('setup')" aria-label="Settings">⚙</button>
+    <button class="settings-btn" onclick="showPanel('setup')">⚙</button>
   </div>
 </div>
-<div class="progress-bar" id="progressBar" style="display:none">
-  <div class="progress-fill" id="progressFill" style="width:0;background:var(--acc)"></div>
-</div>
-<div class="main">
+<div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill" style="width:0"></div></div>
+<div class="voice-status" id="voiceStatus">🎙 Listening for "hold on"</div>
+
+<div class="main" id="mainArea">
+  <!-- SETUP -->
   <div class="panel active" id="panelSetup">
     <div><p style="font-size:15px;margin-bottom:4px;font-weight:500">Setup</p><p class="hint">Barebones hands-free mobile document review.</p></div>
-    <div><p class="label">ElevenLabs API key</p><input type="password" id="apiKeyInput" placeholder="xi-..." autocomplete="off"><p class="hint" style="margin-top:6px">Stored locally on this device only.</p></div>
+    <div><p class="label">ElevenLabs API key</p><input type="password" id="apiKeyInput" placeholder="xi-..." autocomplete="off"><p class="hint" style="margin-top:6px">Stored on this device only.</p></div>
     <div><p class="label">Voice</p><select id="voiceSelect"><option value="">Load voices first...</option></select></div>
     <button class="btn btn-outline" onclick="loadVoices()" id="loadVoicesBtn">Load voices</button>
-    <div><p class="label">Speed</p><div class="speed-control"><label>Slow</label><input type="range" id="speedSlider" min="0.7" max="1.3" step="0.05" value="0.95"><label>Fast</label><span class="speed-val" id="speedVal">0.95</span></div></div>
+    <div><p class="label">Reading speed</p><div class="speed-control"><label>1.0×</label><input type="range" id="speedSlider" min="1.0" max="2.0" step="0.05" value="1.3"><label>2.0×</label><span class="speed-val" id="speedVal">1.30×</span></div></div>
     <button class="btn btn-primary" onclick="saveSettingsAndContinue()" id="saveSettingsBtn" disabled>Save &amp; continue</button>
     <p class="hint" id="setupError" style="color:var(--rec);display:none"></p>
   </div>
+
+  <!-- INPUT -->
   <div class="panel" id="panelInput">
     <div><p class="label">Paste your document</p></div>
     <textarea id="docInput" placeholder="Paste your outline, draft, or any document here..."></textarea>
     <p class="meta" id="wordCount"></p>
-    <div class="hint" style="text-align:center;margin-top:4px">Best with headphones. Say "hold on" to pause and annotate.</div>
+    <div class="hint" style="text-align:center;margin-top:4px">Say "hold on" to pause. Tap any section to jump there.</div>
   </div>
-  <div class="panel" id="panelReading">
-    <div class="status-center">
-      <div class="pulse-ring green" id="readingPulse"><svg viewBox="0 0 24 24" fill="none" stroke="var(--acct)" stroke-width="2" stroke-linecap="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></div>
-      <p style="font-size:14px;color:var(--tx2)">Reading aloud<span class="loading-dots"></span></p>
-      <div class="context-box" id="currentChunkDisplay" style="width:100%;text-align:left;max-height:120px;overflow:hidden"></div>
-      <p class="hint">Say "hold on" to pause — or tap below</p>
-    </div>
+
+  <!-- DOC VIEW (reading/paused/noting all use this) -->
+  <div class="panel" id="panelDoc">
+    <div class="doc-view" id="docView"></div>
   </div>
-  <div class="panel" id="panelPaused">
-    <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:500;color:var(--tx2)">⏸ Paused</span><span class="hint" id="pauseStatus" style="color:var(--acc);margin-left:auto"></span></div>
-    <div class="context-box"><p class="context-label">You stopped here</p><p id="pauseContext"></p></div>
-    <div><p class="context-label">Search anchor</p><div class="search-anchor" id="searchAnchorDisplay" onclick="editSearchAnchor()"></div><input type="text" id="searchAnchorInput" style="display:none;color:var(--infot)" onblur="saveSearchAnchor()" onkeydown="if(event.key==='Enter')saveSearchAnchor()"></div>
-  </div>
+
+  <!-- NOTING OVERLAY -->
   <div class="panel" id="panelNoting">
-    <div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--rec);animation:pulse 1.2s infinite"></div><span style="font-size:14px;font-weight:500;color:var(--rec)">Listening for your note<span class="loading-dots"></span></span></div>
-    <div class="context-box" style="border-left-color:var(--rec);min-height:70px"><p class="live-text" id="noteTranscript">Speak your note... say "done" when finished.</p></div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="mic-dot"></div><span style="font-size:14px;font-weight:500;color:var(--rec)">Listening for your note<span class="loading-dots"></span></span></div>
+    <div class="context-box" style="border-left-color:var(--rec);min-height:70px"><p class="live-text" id="noteTranscript" style="font-style:italic">Speak your note... say "done" when finished.</p></div>
     <div style="background:var(--bg2);padding:8px 12px;border-radius:var(--rad);font-size:12px;color:var(--tx3)">🔍 Anchor: "<span id="notingAnchor"></span>"</div>
+    <div class="context-box" style="margin-top:4px"><p class="context-label">Context</p><p id="notingContext"></p></div>
   </div>
+
+  <!-- REVIEW -->
   <div class="panel" id="panelReview">
-    <div style="display:flex;align-items:center;justify-content:space-between"><p style="font-size:15px;font-weight:500" id="reviewTitle">No notes this session</p><button id="copyTopBtn" style="padding:6px 14px;font-size:13px;border:0.5px solid var(--bdr);border-radius:8px;background:none;cursor:pointer;color:var(--tx);display:none" onclick="copyNotes()">Copy all</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between"><p style="font-size:15px;font-weight:500" id="reviewTitle">No notes</p><button id="copyTopBtn" style="padding:6px 14px;font-size:13px;border:0.5px solid var(--bdr);border-radius:8px;background:none;cursor:pointer;color:var(--tx);display:none" onclick="copyNotes()">Copy all</button></div>
     <div id="notesList"></div>
   </div>
 </div>
+
 <div class="bottom-bar" id="bottomBar"><div id="actionArea"></div></div>
+
 <script>
-var state={mode:'setup',apiKey:'',voiceId:'',speed:0.95,docText:'',chunks:[],chunkIdx:0,notes:[],currentSearch:'',noteText:''};
-var audioEl=new Audio();var audioCache={};var recog=null;var noteRecog=null;var prefetchId=0;
+var S={mode:'setup',apiKey:'',voiceId:'',speed:1.3,docText:'',chunks:[],chunkIdx:0,notes:[],currentSearch:'',noteText:'',isHeading:[]};
+var audioEl=new Audio(),audioCache={},recog=null,noteRecog=null,pfid=0,commandListening=false;
 var TRIGGERS=['hold on','pause','stop','wait','hold up','hang on'];
 var DONES=['done','save',"that's it",'save note','got it','save it'];
-function loadState(){try{var k=localStorage.getItem('f2a_apikey'),v=localStorage.getItem('f2a_voice'),s=localStorage.getItem('f2a_speed');if(k)state.apiKey=k;if(v)state.voiceId=v;if(s)state.speed=parseFloat(s);}catch(e){}}
-function saveSettings(){try{localStorage.setItem('f2a_apikey',state.apiKey);localStorage.setItem('f2a_voice',state.voiceId);localStorage.setItem('f2a_speed',state.speed);}catch(e){}}
-function chunkDoc(text){var lines=text.split(/\n/),result=[],cur='';for(var i=0;i<lines.length;i++){var t=lines[i].trim();if(!t){if(cur.trim()){result.push(cur.trim());cur='';}continue;}if(/^#{1,4}\s/.test(t)){if(cur.trim())result.push(cur.trim());result.push(t.replace(/^#+\s*/,''));cur='';continue;}cur+=' '+t;if(cur.length>240){var sents=cur.match(/[^.!?]+[.!?]+/g);if(sents&&sents.length>1){var mid=Math.ceil(sents.length/2);result.push(sents.slice(0,mid).join('').trim());cur=sents.slice(mid).join('');}else{result.push(cur.trim());cur='';}}}if(cur.trim())result.push(cur.trim());return result.filter(function(c){return c.length>0});}
-function getSearchPhrase(text){var clean=text.replace(/[#*_\->\[\](){}]/g,'').trim(),words=clean.split(/\s+/).filter(Boolean);if(words.length<=7)return clean;var mid=Math.max(0,Math.floor(words.length/2)-3);return words.slice(mid,mid+7).join(' ');}
-async function fetchVoices(){var key=document.getElementById('apiKeyInput').value.trim();if(!key){showSetupError('Enter your API key first');return;}document.getElementById('loadVoicesBtn').textContent='Loading...';try{var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':key}});if(!res.ok)throw new Error('Invalid API key or network error');var data=await res.json(),sel=document.getElementById('voiceSelect');sel.innerHTML='';for(var i=0;i<data.voices.length;i++){var v=data.voices[i],opt=document.createElement('option');opt.value=v.voice_id;opt.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(opt);}if(data.voices.length>0){sel.value=state.voiceId||data.voices[0].voice_id;document.getElementById('saveSettingsBtn').disabled=false;}hideSetupError();}catch(e){showSetupError('Failed to load voices: '+e.message);}document.getElementById('loadVoicesBtn').textContent='Load voices';}
-async function generateAudio(text){var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+state.voiceId+'?output_format=mp3_44100_128',{method:'POST',headers:{'xi-api-key':state.apiKey,'Content-Type':'application/json'},body:JSON.stringify({text:text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.75,speed:state.speed}})});if(!res.ok)throw new Error('ElevenLabs API error: '+res.status);var blob=await res.blob();return URL.createObjectURL(blob);}
-async function prefetchChunk(idx){if(idx>=state.chunks.length||audioCache[idx])return;var id=++prefetchId;try{var url=await generateAudio(state.chunks[idx]);if(prefetchId===id)audioCache[idx]=url;}catch(e){}}
-async function playChunk(idx){if(idx>=state.chunks.length){stopRecognition();showPanel('review');updateReview();return;}state.chunkIdx=idx;updateProgress();document.getElementById('currentChunkDisplay').textContent=state.chunks[idx];var url=audioCache[idx];if(!url){document.getElementById('readingPulse').style.opacity='0.4';try{url=await generateAudio(state.chunks[idx]);}catch(e){setTimeout(function(){playChunk(idx+1);},500);return;}document.getElementById('readingPulse').style.opacity='1';audioCache[idx]=url;}prefetchChunk(idx+1);audioEl.src=url;audioEl.onended=function(){if(state.mode==='reading')playChunk(idx+1);};audioEl.onerror=function(){if(state.mode==='reading')playChunk(idx+1);};try{await audioEl.play();}catch(e){}}
+var RESUMES=['continue','resume','keep going','go ahead','next'];
+
+// PERSISTENCE
+function loadS(){try{var k=localStorage.getItem('f2a_key'),v=localStorage.getItem('f2a_voice'),s=localStorage.getItem('f2a_speed');if(k)S.apiKey=k;if(v)S.voiceId=v;if(s)S.speed=parseFloat(s);}catch(e){}}
+function saveS(){try{localStorage.setItem('f2a_key',S.apiKey);localStorage.setItem('f2a_voice',S.voiceId);localStorage.setItem('f2a_speed',S.speed);}catch(e){}}
+
+// CHUNKING
+function chunkDoc(text){
+  var lines=text.split(/\n/),result=[],heads=[],cur='';
+  for(var i=0;i<lines.length;i++){
+    var t=lines[i].trim();
+    if(!t){if(cur.trim()){result.push(cur.trim());heads.push(false);cur='';}continue;}
+    if(/^#{1,4}\s/.test(t)){
+      if(cur.trim()){result.push(cur.trim());heads.push(false);}
+      result.push(t.replace(/^#+\s*/,''));heads.push(true);cur='';continue;
+    }
+    cur+=' '+t;
+    if(cur.length>220){
+      var sents=cur.match(/[^.!?]+[.!?]+/g);
+      if(sents&&sents.length>1){var m=Math.ceil(sents.length/2);result.push(sents.slice(0,m).join('').trim());heads.push(false);cur=sents.slice(m).join('');}
+      else{result.push(cur.trim());heads.push(false);cur='';}
+    }
+  }
+  if(cur.trim()){result.push(cur.trim());heads.push(false);}
+  S.isHeading=heads;
+  return result.filter(function(c,i){if(c.length>0)return true;S.isHeading.splice(i,1);return false;});
+}
+
+function getSearchPhrase(text){
+  var w=text.replace(/[#*_\->\[\](){}]/g,'').trim().split(/\s+/).filter(Boolean);
+  if(w.length<=7)return w.join(' ');
+  var m=Math.max(0,Math.floor(w.length/2)-3);
+  return w.slice(m,m+7).join(' ');
+}
+
+// ELEVENLABS
+async function fetchVoices(){
+  var key=$('apiKeyInput').value.trim();
+  if(!key){showErr('Enter your API key first');return;}
+  $('loadVoicesBtn').textContent='Loading...';
+  try{
+    var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':key}});
+    if(!res.ok)throw new Error('Invalid key or network error');
+    var data=await res.json(),sel=$('voiceSelect');sel.innerHTML='';
+    data.voices.forEach(function(v){var o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(o);});
+    if(data.voices.length>0){sel.value=S.voiceId||data.voices[0].voice_id;$('saveSettingsBtn').disabled=false;}
+    hideErr();
+  }catch(e){showErr('Failed: '+e.message);}
+  $('loadVoicesBtn').textContent='Load voices';
+}
+
+async function genAudio(text){
+  var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+S.voiceId+'?output_format=mp3_44100_128',{
+    method:'POST',headers:{'xi-api-key':S.apiKey,'Content-Type':'application/json'},
+    body:JSON.stringify({text:text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.75},speed:S.speed})
+  });
+  if(!res.ok)throw new Error('API error: '+res.status);
+  return URL.createObjectURL(await res.blob());
+}
+
+async function prefetch(idx){if(idx>=S.chunks.length||audioCache[idx])return;var id=++pfid;try{var u=await genAudio(S.chunks[idx]);if(pfid===id)audioCache[idx]=u;}catch(e){}}
+
+// PLAYBACK
+async function playChunk(idx){
+  if(idx>=S.chunks.length){stopAll();S.mode='review';showPanel('review');updateReview();updateActions();return;}
+  S.chunkIdx=idx;updateProgress();renderDocView();scrollToChunk(idx);
+  var url=audioCache[idx];
+  if(!url){try{url=await genAudio(S.chunks[idx]);}catch(e){setTimeout(function(){playChunk(idx+1);},300);return;}audioCache[idx]=url;}
+  prefetch(idx+1);prefetch(idx+2);
+  audioEl.src=url;
+  audioEl.onended=function(){if(S.mode==='reading')playChunk(idx+1);};
+  audioEl.onerror=function(){if(S.mode==='reading')playChunk(idx+1);};
+  try{await audioEl.play();}catch(e){console.warn('play blocked',e);}
+}
+
 function stopAudio(){audioEl.pause();audioEl.onended=null;audioEl.currentTime=0;}
+
+// SPEECH RECOGNITION
 function getSR(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
-function startCommandListener(){var SR=getSR();if(!SR)return;stopRecognition();recog=new SR();recog.continuous=true;recog.interimResults=true;recog.lang='en-US';recog.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++){var t=e.results[i][0].transcript.toLowerCase().trim();if(TRIGGERS.some(function(w){return t.includes(w);})){doPause();return;}}};recog.onend=function(){if(state.mode==='reading'&&recog){try{recog.start();}catch(e){}}};recog.onerror=function(e){if(e.error!=='aborted'&&state.mode==='reading'){setTimeout(function(){try{if(recog)recog.start();}catch(ex){}},600);}};try{recog.start();}catch(e){}}
-function startNoteListener(){var SR=getSR();if(!SR)return;if(noteRecog){try{noteRecog.stop();}catch(e){}}noteRecog=new SR();noteRecog.continuous=true;noteRecog.interimResults=true;noteRecog.lang='en-US';var finalText='';noteRecog.onresult=function(e){var interim='';for(var i=e.resultIndex;i<e.results.length;i++){var transcript=e.results[i][0].transcript;if(e.results[i].isFinal){var lower=transcript.toLowerCase().trim();if(DONES.some(function(w){return lower.includes(w);})&&finalText.length>3){doSaveNote(finalText.trim());return;}finalText+=transcript+' ';}else{interim=transcript;}}state.noteText=(finalText+interim).trim();document.getElementById('noteTranscript').textContent=state.noteText||'Speak your note... say "done" when finished.';document.getElementById('noteTranscript').style.fontStyle=state.noteText?'normal':'italic';};noteRecog.onend=function(){if(state.mode==='noting'&&noteRecog){try{noteRecog.start();}catch(e){}}};noteRecog.onerror=function(e){if(e.error!=='aborted'&&state.mode==='noting'){setTimeout(function(){try{if(noteRecog)noteRecog.start();}catch(ex){}},600);}};try{noteRecog.start();}catch(e){}}
-function stopRecognition(){if(recog){try{recog.stop();}catch(e){}recog=null;}if(noteRecog){try{noteRecog.stop();}catch(e){}noteRecog=null;}}
-function startReading(){var text=document.getElementById('docInput').value.trim();if(!text)return;state.docText=text;state.chunks=chunkDoc(text);state.chunkIdx=0;state.notes=[];audioCache={};if(state.chunks.length===0)return;state.mode='reading';showPanel('reading');document.getElementById('progressBar').style.display='block';document.getElementById('progressPct').style.display='inline';updateNotesBadge();updateProgress();prefetchChunk(0);prefetchChunk(1);setTimeout(function(){startCommandListener();playChunk(0);},300);}
-function doPause(){stopAudio();stopRecognition();state.mode='paused';var chunk=state.chunks[state.chunkIdx]||'';state.currentSearch=getSearchPhrase(chunk);document.getElementById('pauseContext').textContent=chunk;document.getElementById('searchAnchorDisplay').textContent='"'+state.currentSearch+'"';document.getElementById('searchAnchorDisplay').style.display='block';document.getElementById('searchAnchorInput').style.display='none';document.getElementById('pauseStatus').textContent='';showPanel('paused');updateActions();}
-function doStartNoting(){state.mode='noting';state.noteText='';document.getElementById('noteTranscript').textContent='Speak your note... say "done" when finished.';document.getElementById('noteTranscript').style.fontStyle='italic';document.getElementById('notingAnchor').textContent=state.currentSearch;showPanel('noting');updateActions();startNoteListener();}
-function doSaveNote(overrideText){stopRecognition();var text=(overrideText||state.noteText||'').trim();if(text){state.notes.push({id:Date.now(),search:state.currentSearch,note:text,chunkIndex:state.chunkIdx});updateNotesBadge();}state.noteText='';state.mode='paused';document.getElementById('pauseStatus').textContent=text?'✓ Note saved':'';showPanel('paused');updateActions();}
-function doResume(){state.mode='reading';showPanel('reading');updateActions();startCommandListener();playChunk(state.chunkIdx);}
-function doEndReview(){stopAudio();stopRecognition();state.mode='review';showPanel('review');updateReview();updateActions();}
-function doNewDoc(){stopAudio();stopRecognition();state.mode='input';state.docText='';state.chunks=[];state.chunkIdx=0;state.notes=[];audioCache={};document.getElementById('docInput').value='';document.getElementById('progressBar').style.display='none';document.getElementById('progressPct').style.display='none';updateNotesBadge();showPanel('input');updateActions();}
-function editSearchAnchor(){document.getElementById('searchAnchorDisplay').style.display='none';var inp=document.getElementById('searchAnchorInput');inp.value=state.currentSearch;inp.style.display='block';inp.focus();}
-function saveSearchAnchor(){state.currentSearch=document.getElementById('searchAnchorInput').value.trim()||state.currentSearch;document.getElementById('searchAnchorDisplay').textContent='"'+state.currentSearch+'"';document.getElementById('searchAnchorDisplay').style.display='block';document.getElementById('searchAnchorInput').style.display='none';}
-function deleteNote(id){state.notes=state.notes.filter(function(n){return n.id!==id;});updateReview();updateNotesBadge();}
-function copyNotes(){var text=state.notes.map(function(n,i){return'NOTE '+(i+1)+'\nSEARCH: '+n.search+'\nNOTE: '+n.note+'\n';}).join('\n---\n\n');navigator.clipboard.writeText(text).then(function(){var b=document.getElementById('copyTopBtn');if(b){b.textContent='✓ Copied!';setTimeout(function(){b.textContent='Copy all';},2000);}var b2=document.getElementById('copyMainBtn');if(b2){b2.textContent='✓ Copied!';setTimeout(function(){b2.textContent='📋 Copy all notes';},2000);}});}
-function showPanel(name){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});var el=document.getElementById('panel'+name.charAt(0).toUpperCase()+name.slice(1));if(el)el.classList.add('active');state.mode=name;updateActions();updateProgressColor();}
-function updateProgress(){var pct=state.chunks.length>0?Math.round((state.chunkIdx/state.chunks.length)*100):0;document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%';}
-function updateProgressColor(){var fill=document.getElementById('progressFill');if(state.mode==='reading')fill.style.background='var(--acc)';else if(state.mode==='noting')fill.style.background='var(--rec)';else fill.style.background='var(--bdr2)';}
-function updateNotesBadge(){var el=document.getElementById('noteCount');if(state.notes.length>0){el.style.display='inline';el.textContent=state.notes.length+' note'+(state.notes.length!==1?'s':'');}else{el.style.display='none';}}
-function updateReview(){var list=document.getElementById('notesList'),title=document.getElementById('reviewTitle'),copyBtn=document.getElementById('copyTopBtn');if(state.notes.length===0){title.textContent='No notes this session';if(copyBtn)copyBtn.style.display='none';list.innerHTML='';return;}title.textContent=state.notes.length+' note'+(state.notes.length!==1?'s':'')+' ready';if(copyBtn)copyBtn.style.display='inline-block';list.innerHTML=state.notes.map(function(n,i){return'<div class="note-card" style="margin-top:12px"><button class="note-del" onclick="deleteNote('+n.id+')" aria-label="Delete note">×</button><p class="note-num">Note '+(i+1)+'</p><p class="note-search">🔍 '+esc(n.search)+'</p><p class="note-text">'+esc(n.note)+'</p></div>';}).join('');}
-function updateActions(){var area=document.getElementById('actionArea');if(state.mode==='setup'){area.innerHTML='';}else if(state.mode==='input'){area.innerHTML='<button class="btn btn-primary" onclick="startReading()" id="startBtn">▶ Start review</button>';}else if(state.mode==='reading'){area.innerHTML='<button class="btn btn-outline" onclick="doPause()" style="padding:20px;font-size:18px">⏸ Hold on</button>';}else if(state.mode==='paused'){area.innerHTML='<button class="btn btn-record" onclick="doStartNoting()" style="margin-bottom:8px">🎙 Make a note</button><div class="btn-row"><button class="btn btn-outline" onclick="doResume()">▶ Continue</button><button class="btn btn-outline" onclick="doEndReview()">🏁 End review</button></div>';}else if(state.mode==='noting'){area.innerHTML='<div class="btn-row"><button class="btn btn-save" style="flex:2" onclick="doSaveNote()">✓ Save note</button><button class="btn btn-outline" style="flex:1" onclick="cancelNote()">Cancel</button></div>';}else if(state.mode==='review'){var html='';if(state.notes.length>0){html+='<button class="btn btn-primary" onclick="copyNotes()" style="margin-bottom:8px" id="copyMainBtn">📋 Copy all notes</button>';}html+='<button class="btn btn-outline" onclick="doNewDoc()">📄 New document</button>';area.innerHTML=html;}}
-function cancelNote(){stopRecognition();state.noteText='';state.mode='paused';showPanel('paused');}
+
+function startCommands(){
+  var SR=getSR();if(!SR)return;
+  stopCommands();
+  recog=new SR();recog.continuous=true;recog.interimResults=true;recog.lang='en-US';
+  commandListening=true;$('voiceStatus').style.display='block';
+  recog.onresult=function(e){
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      var t=e.results[i][0].transcript.toLowerCase().trim();
+      if(TRIGGERS.some(function(w){return t.includes(w);})){doPause();return;}
+    }
+  };
+  recog.onend=function(){
+    if(S.mode==='reading'&&commandListening){
+      setTimeout(function(){try{if(recog&&S.mode==='reading')recog.start();}catch(e){}},200);
+    }
+  };
+  recog.onerror=function(e){
+    if(e.error!=='aborted'&&S.mode==='reading'&&commandListening){
+      setTimeout(function(){try{if(recog&&S.mode==='reading')recog.start();}catch(e){}},500);
+    }
+  };
+  try{recog.start();}catch(e){}
+}
+
+function stopCommands(){commandListening=false;$('voiceStatus').style.display='none';if(recog){try{recog.stop();}catch(e){}recog=null;}}
+
+function startNoteListen(){
+  var SR=getSR();if(!SR)return;
+  if(noteRecog){try{noteRecog.stop();}catch(e){}}
+  noteRecog=new SR();noteRecog.continuous=true;noteRecog.interimResults=true;noteRecog.lang='en-US';
+  var finalText='';
+  noteRecog.onresult=function(e){
+    var interim='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      var tr=e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        var lo=tr.toLowerCase().trim();
+        if(DONES.some(function(w){return lo.includes(w);})&&finalText.length>3){doSaveNote(finalText.trim());return;}
+        finalText+=tr+' ';
+      }else interim=tr;
+    }
+    S.noteText=(finalText+interim).trim();
+    $('noteTranscript').textContent=S.noteText||'Speak your note... say "done" when finished.';
+    $('noteTranscript').style.fontStyle=S.noteText?'normal':'italic';
+  };
+  noteRecog.onend=function(){if(S.mode==='noting'&&noteRecog){setTimeout(function(){try{noteRecog.start();}catch(e){}},200);}};
+  noteRecog.onerror=function(e){if(e.error!=='aborted'&&S.mode==='noting'){setTimeout(function(){try{if(noteRecog)noteRecog.start();}catch(e){}},500);}};
+  try{noteRecog.start();}catch(e){}
+}
+
+function stopNoteListen(){if(noteRecog){try{noteRecog.stop();}catch(e){}noteRecog=null;}}
+function stopAll(){stopAudio();stopCommands();stopNoteListen();}
+
+// DOC VIEW
+function renderDocView(){
+  var v=$('docView');v.innerHTML='';
+  S.chunks.forEach(function(c,i){
+    var d=document.createElement('div');
+    d.className='doc-chunk'+(i===S.chunkIdx?' current':'')+(i<S.chunkIdx?' played':'')+(S.isHeading[i]?' heading':'');
+    d.textContent=c;
+    d.setAttribute('data-idx',i);
+    d.onclick=function(){jumpTo(i);};
+    v.appendChild(d);
+  });
+}
+
+function scrollToChunk(idx){
+  var el=$('docView').children[idx];
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function jumpTo(idx){
+  if(idx<0)idx=0;
+  if(idx>=S.chunks.length)idx=S.chunks.length-1;
+  stopAudio();
+  S.chunkIdx=idx;
+  S.mode='reading';
+  showPanel('doc');
+  updateActions();updateProgress();renderDocView();scrollToChunk(idx);
+  startCommands();
+  playChunk(idx);
+}
+
+function nextSection(){
+  for(var i=S.chunkIdx+1;i<S.chunks.length;i++){if(S.isHeading[i]){jumpTo(i);return;}}
+  jumpTo(S.chunks.length-1);
+}
+function prevSection(){
+  for(var i=S.chunkIdx-1;i>=0;i--){if(S.isHeading[i]){jumpTo(i);return;}}
+  jumpTo(0);
+}
+
+// ACTIONS
+function startReading(){
+  var text=$('docInput').value.trim();if(!text)return;
+  S.docText=text;S.chunks=chunkDoc(text);S.chunkIdx=0;S.notes=[];audioCache={};
+  if(!S.chunks.length)return;
+  S.mode='reading';showPanel('doc');renderDocView();
+  $('progressBar').style.display='block';$('progressPct').style.display='inline';
+  updateNotesBadge();updateProgress();updateActions();
+  prefetch(0);prefetch(1);
+  setTimeout(function(){startCommands();playChunk(0);},300);
+}
+
+function doPause(){
+  stopAudio();stopCommands();
+  S.mode='paused';
+  S.currentSearch=getSearchPhrase(S.chunks[S.chunkIdx]||'');
+  renderDocView();scrollToChunk(S.chunkIdx);
+  updateActions();
+}
+
+function doStartNoting(){
+  S.mode='noting';S.noteText='';
+  $('noteTranscript').textContent='Speak your note... say "done" when finished.';
+  $('noteTranscript').style.fontStyle='italic';
+  $('notingAnchor').textContent=S.currentSearch;
+  $('notingContext').textContent=S.chunks[S.chunkIdx]||'';
+  showPanel('noting');updateActions();
+  startNoteListen();
+}
+
+function doSaveNote(override){
+  stopNoteListen();
+  var text=(override||S.noteText||'').trim();
+  if(text){S.notes.push({id:Date.now(),search:S.currentSearch,note:text,chunkIndex:S.chunkIdx});updateNotesBadge();}
+  S.noteText='';S.mode='paused';
+  showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);
+  updateActions();
+}
+
+function doResume(){
+  S.mode='reading';showPanel('doc');updateActions();
+  startCommands();playChunk(S.chunkIdx);
+}
+
+function doEndReview(){stopAll();S.mode='review';showPanel('review');updateReview();updateActions();}
+function doNewDoc(){stopAll();S.mode='input';S.docText='';S.chunks=[];S.chunkIdx=0;S.notes=[];audioCache={};$('docInput').value='';$('progressBar').style.display='none';$('progressPct').style.display='none';updateNotesBadge();showPanel('input');updateActions();}
+function cancelNote(){stopNoteListen();S.noteText='';S.mode='paused';showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();}
+
+// NOTES
+function deleteNote(id){S.notes=S.notes.filter(function(n){return n.id!==id;});updateReview();updateNotesBadge();}
+function copyNotes(){
+  var t=S.notes.map(function(n,i){return'NOTE '+(i+1)+'\nSEARCH: '+n.search+'\nNOTE: '+n.note+'\n';}).join('\n---\n\n');
+  navigator.clipboard.writeText(t).then(function(){
+    ['copyTopBtn','copyMainBtn'].forEach(function(id){var b=$(id);if(b){b.textContent='✓ Copied!';setTimeout(function(){b.textContent=id==='copyTopBtn'?'Copy all':'📋 Copy all notes';},2000);}});
+  });
+}
+
+// UI
+function $(id){return document.getElementById(id);}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function showSetupError(msg){var el=document.getElementById('setupError');el.textContent=msg;el.style.display='block';}
-function hideSetupError(){document.getElementById('setupError').style.display='none';}
+function showErr(m){$('setupError').textContent=m;$('setupError').style.display='block';}
+function hideErr(){$('setupError').style.display='none';}
+
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  var map={setup:'panelSetup',input:'panelInput',doc:'panelDoc',noting:'panelNoting',review:'panelReview'};
+  var el=$(map[name]);if(el)el.classList.add('active');
+}
+
+function updateProgress(){
+  var pct=S.chunks.length?Math.round((S.chunkIdx/S.chunks.length)*100):0;
+  $('progressFill').style.width=pct+'%';$('progressPct').textContent=pct+'%';
+}
+
+function updateNotesBadge(){
+  var el=$('noteCount');
+  if(S.notes.length>0){el.style.display='inline';el.textContent=S.notes.length+' note'+(S.notes.length!==1?'s':'');}
+  else el.style.display='none';
+}
+
+function updateReview(){
+  var list=$('notesList'),title=$('reviewTitle'),cb=$('copyTopBtn');
+  if(!S.notes.length){title.textContent='No notes this session';if(cb)cb.style.display='none';list.innerHTML='';return;}
+  title.textContent=S.notes.length+' note'+(S.notes.length!==1?'s':'')+' ready';
+  if(cb)cb.style.display='inline-block';
+  list.innerHTML=S.notes.map(function(n,i){
+    return'<div class="note-card" style="margin-top:12px"><button class="note-del" onclick="deleteNote('+n.id+')">×</button><p class="note-num">Note '+(i+1)+'</p><p class="note-search">🔍 '+esc(n.search)+'</p><p class="note-text">'+esc(n.note)+'</p></div>';
+  }).join('');
+}
+
+function updateActions(){
+  var a=$('actionArea'),h='';
+  if(S.mode==='setup'){a.innerHTML='';return;}
+  if(S.mode==='input'){h='<button class="btn btn-primary" onclick="startReading()">▶ Start review</button>';}
+  else if(S.mode==='reading'){
+    h='<div class="nav-row"><button class="btn btn-outline btn-sm" onclick="prevSection()">⏮ Prev</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx-1)">◀</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx+1)">▶</button><button class="btn btn-outline btn-sm" onclick="nextSection()">⏭ Next</button></div>';
+    h+='<button class="btn btn-outline" onclick="doPause()" style="padding:18px;font-size:17px">⏸ Hold on</button>';
+  }
+  else if(S.mode==='paused'){
+    h='<div class="nav-row"><button class="btn btn-outline btn-sm" onclick="prevSection()">⏮ Prev</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx-1)">◀ Back</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx+1)">Fwd ▶</button><button class="btn btn-outline btn-sm" onclick="nextSection()">Next ⏭</button></div>';
+    h+='<button class="btn btn-record" onclick="doStartNoting()" style="margin-bottom:6px">🎙 Make a note</button>';
+    h+='<div class="btn-row"><button class="btn btn-outline" onclick="doResume()">▶ Continue</button><button class="btn btn-outline" onclick="doEndReview()">🏁 End</button></div>';
+  }
+  else if(S.mode==='noting'){
+    h='<div class="btn-row"><button class="btn btn-save" style="flex:2" onclick="doSaveNote()">✓ Save note</button><button class="btn btn-outline" style="flex:1" onclick="cancelNote()">Cancel</button></div>';
+  }
+  else if(S.mode==='review'){
+    if(S.notes.length)h+='<button class="btn btn-primary" onclick="copyNotes()" style="margin-bottom:8px" id="copyMainBtn">📋 Copy all notes</button>';
+    h+='<button class="btn btn-outline" onclick="doNewDoc()">📄 New document</button>';
+  }
+  a.innerHTML=h;
+}
+
 function loadVoices(){fetchVoices();}
-function saveSettingsAndContinue(){var key=document.getElementById('apiKeyInput').value.trim(),voice=document.getElementById('voiceSelect').value,speed=parseFloat(document.getElementById('speedSlider').value);if(!key||!voice){showSetupError('Need API key and voice');return;}state.apiKey=key;state.voiceId=voice;state.speed=speed;saveSettings();showPanel('input');}
-document.getElementById('docInput').addEventListener('input',function(){var words=this.value.trim().split(/\s+/).filter(Boolean).length;document.getElementById('wordCount').textContent=words>0?words.toLocaleString()+' words — ~'+Math.ceil(words/140)+' min':'';});
-document.getElementById('speedSlider').addEventListener('input',function(){document.getElementById('speedVal').textContent=parseFloat(this.value).toFixed(2);});
-loadState();
-if(state.apiKey){document.getElementById('apiKeyInput').value=state.apiKey;document.getElementById('speedSlider').value=state.speed;document.getElementById('speedVal').textContent=state.speed.toFixed(2);setTimeout(async function(){try{var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':state.apiKey}});if(res.ok){var data=await res.json(),sel=document.getElementById('voiceSelect');sel.innerHTML='';for(var i=0;i<data.voices.length;i++){var v=data.voices[i],opt=document.createElement('option');opt.value=v.voice_id;opt.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(opt);}if(state.voiceId)sel.value=state.voiceId;document.getElementById('saveSettingsBtn').disabled=false;if(state.voiceId&&sel.value)showPanel('input');}}catch(e){}},100);}
-if(!getSR()){var hint=document.createElement('p');hint.className='hint';hint.style.cssText='color:var(--rec);margin-top:12px;text-align:center';hint.textContent='⚠ Speech recognition not available. Voice commands won\'t work, but buttons will. Use Safari for full voice control.';document.querySelector('.main').appendChild(hint);}
+function saveSettingsAndContinue(){
+  var key=$('apiKeyInput').value.trim(),voice=$('voiceSelect').value,speed=parseFloat($('speedSlider').value);
+  if(!key||!voice){showErr('Need API key and voice');return;}
+  S.apiKey=key;S.voiceId=voice;S.speed=speed;saveS();showPanel('input');S.mode='input';updateActions();
+}
+
+$('docInput').addEventListener('input',function(){
+  var w=this.value.trim().split(/\s+/).filter(Boolean).length;
+  $('wordCount').textContent=w>0?w.toLocaleString()+' words — ~'+Math.ceil(w/140)+' min':'';
+});
+$('speedSlider').addEventListener('input',function(){$('speedVal').textContent=parseFloat(this.value).toFixed(2)+'×';});
+
+// INIT
+loadS();
+if(S.apiKey){
+  $('apiKeyInput').value=S.apiKey;$('speedSlider').value=S.speed;$('speedVal').textContent=S.speed.toFixed(2)+'×';
+  setTimeout(async function(){
+    try{
+      var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':S.apiKey}});
+      if(res.ok){
+        var data=await res.json(),sel=$('voiceSelect');sel.innerHTML='';
+        data.voices.forEach(function(v){var o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(o);});
+        if(S.voiceId)sel.value=S.voiceId;$('saveSettingsBtn').disabled=false;
+        if(S.voiceId&&sel.value){S.mode='input';showPanel('input');updateActions();}
+      }
+    }catch(e){}
+  },100);
+}
+if(!getSR()){var h=document.createElement('p');h.className='hint';h.style.cssText='color:var(--rec);margin-top:12px;text-align:center';h.textContent='⚠ No speech recognition. Buttons only.';$('mainArea').appendChild(h);}
 updateActions();
 </script>
 </body>
