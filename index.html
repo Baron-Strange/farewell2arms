@@ -294,14 +294,16 @@ function startReading(){
 
 function doHoldOn(){
   stopAudio();
-  S.mode='noting';S.noteText='';
+  S.mode='noting';S.noteText='';noteFinal='';
   S.currentSearch=getSearchPhrase(S.chunks[S.chunkIdx]||'');
   $('noteTranscript').textContent='Listening...';
   $('noteTranscript').style.fontStyle='italic';
   $('notingAnchor').textContent=S.currentSearch;
   $('notingContext').textContent=S.chunks[S.chunkIdx]||'';
   showPanel('noting');updateActions();
-  setRecMode('noting');
+  // Force fresh recognizer for clean note capture
+  try{recognizer.stop();}catch(e){}recognizer=null;
+  setTimeout(function(){startListening('noting');},300);
 }
 
 function doSaveAndResume(override){
@@ -309,16 +311,19 @@ function doSaveAndResume(override){
   if(text){S.notes.push({id:Date.now(),search:S.currentSearch,note:text,chunkIndex:S.chunkIdx});updateNotesBadge();}
   S.noteText='';S.mode='reading';
   showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();
-  setRecMode('commands');playChunk(S.chunkIdx);
+  try{recognizer.stop();}catch(e){}recognizer=null;
+  setTimeout(function(){startListening('commands');playChunk(S.chunkIdx);},300);
 }
 
 function doSkipAndResume(){
   S.noteText='';S.mode='reading';
   showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();
-  setRecMode('commands');playChunk(S.chunkIdx);
+  try{recognizer.stop();}catch(e){}recognizer=null;
+  setTimeout(function(){startListening('commands');playChunk(S.chunkIdx);},300);
 }
 
 function doEndReview(){stopAll();S.mode='review';showPanel('review');updateReview();updateActions();}
+function backToDoc(){S.mode='reading';showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();startListening('commands');playChunk(S.chunkIdx);}
 function doNewDoc(){stopAll();S.mode='input';S.docText='';S.chunks=[];S.chunkIdx=0;S.notes=[];audioCache={};$('docInput').value='';$('progressBar').style.display='none';$('progressPct').style.display='none';updateNotesBadge();showPanel('input');updateActions();}
 
 // NOTES
@@ -361,6 +366,7 @@ function updateActions(){
   }
   else if(S.mode==='review'){
     if(S.notes.length)h+='<button class="btn btn-primary" onclick="copyNotes()" style="margin-bottom:8px" id="copyMainBtn">📋 Copy all notes</button>';
+    if(S.chunks.length)h+='<button class="btn btn-outline" onclick="backToDoc()" style="margin-bottom:8px">← Back to document</button>';
     h+='<button class="btn btn-outline" onclick="doNewDoc()">📄 New document</button>';
   }
   a.innerHTML=h;
