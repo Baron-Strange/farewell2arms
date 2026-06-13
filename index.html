@@ -117,7 +117,8 @@ select{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding
 
 <script>
 var S={mode:'setup',apiKey:'',voiceId:'',speed:1.3,docText:'',chunks:[],chunkIdx:0,notes:[],currentSearch:'',noteText:'',isHeading:[]};
-var audioEl=new Audio(),audioCache={},recog=null,noteRecog=null,pfid=0,watchdog=null;
+var audioEl=new Audio(),audioCache={},pfid=0;
+var recognizer=null,recMode='idle',noteFinal='',watchdog=null;
 var TRIGGERS=['hold on','pause','stop','wait','hold up','hang on'];
 var DONES=['done','save',"that's it",'save note','got it','save it'];
 var RESUMES=['continue','resume','keep going','go ahead','skip','next'];
@@ -173,54 +174,94 @@ async function playChunk(idx){
 }
 function stopAudio(){audioEl.pause();audioEl.onended=null;audioEl.currentTime=0;}
 
-// SPEECH RECOGNITION
+// UNIFIED SPEECH RECOGNITION — one instance, never stop, switch modes
 function getSR(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
 
-function startCommands(){
-  var SR=getSR();if(!SR)return;stopCommands();
-  recog=new SR();recog.continuous=true;recog.interimResults=true;recog.lang='en-US';
-  $('voiceBar').className='voice-bar listening';
-  recog.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++){var t=e.results[i][0].transcript.toLowerCase().trim();if(TRIGGERS.some(function(w){return t.includes(w);})){doHoldOn();return;}}};
-  recog.onend=function(){if(S.mode==='reading'){setTimeout(function(){if(S.mode==='reading'&&recog){try{recog.start();}catch(e){startCommands();}}},150);}};
-  recog.onerror=function(e){if(e.error!=='aborted'&&S.mode==='reading'){setTimeout(function(){if(S.mode==='reading')startCommands();},400);}};
-  try{recog.start();}catch(e){}
-  // Watchdog: force-restart recognition every 25s to prevent Safari timeout death
-  if(watchdog)clearInterval(watchdog);
-  watchdog=setInterval(function(){
-    if(S.mode==='reading'){try{recog.stop();}catch(e){}setTimeout(function(){if(S.mode==='reading'){try{recog.start();}catch(e){startCommands();}}},300);}
-    else{clearInterval(watchdog);watchdog=null;}
-  },25000);
-}
-function stopCommands(){$('voiceBar').className='voice-bar';if(watchdog){clearInterval(watchdog);watchdog=null;}if(recog){try{recog.stop();}catch(e){}recog=null;}}
+function ensureRecognizer(){
+  if(recognizer)return;
+  var SR=getSR();if(!SR)return;
+  recognizer=new SR();recognizer.continuous=true;recognizer.interimResults=true;recognizer.lang='en-US';
 
-function startNoteListen(){
-  var SR=getSR();if(!SR)return;stopNoteListen();
-  noteRecog=new SR();noteRecog.continuous=true;noteRecog.interimResults=true;noteRecog.lang='en-US';
-  $('voiceBar').className='voice-bar recording';$('voiceBar').textContent='🔴 Recording note — "done" to save, "continue" to skip';
-  var finalText='';
-  noteRecog.onresult=function(e){
-    var interim='';
-    for(var i=e.resultIndex;i<e.results.length;i++){
-      var tr=e.results[i][0].transcript;
-      if(e.results[i].isFinal){
-        var lo=tr.toLowerCase().trim();
-        // Check for save commands (only if we have some note text)
-        if(DONES.some(function(w){return lo.includes(w);})&&finalText.length>3){doSaveAndResume(finalText.trim());return;}
-        // Check for skip/continue commands
-        if(RESUMES.some(function(w){return lo.includes(w);})){doSkipAndResume();return;}
-        finalText+=tr+' ';
-      }else{interim=tr;}
+  recognizer.onresult=function(e){
+    if(recMode==='commands'){
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var t=e.results[i][0].transcript.toLowerCase().trim();
+        if(TRIGGERS.some(function(w){return t.includes(w);})){
+          setTimeout(doHoldOn,0);return;
+        }
+      }
+    }else if(recMode==='noting'){
+      var interim='';
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var tr=e.results[i][0].transcript;
+        if(e.results[i].isFinal){
+          var lo=tr.toLowerCase().trim();
+          if(DONES.some(function(w){return lo.includes(w);})&&noteFinal.length>3){setTimeout(function(){doSaveAndResume(noteFinal.trim());},0);return;}
+          if(RESUMES.some(function(w){return lo.includes(w);})){setTimeout(doSkipAndResume,0);return;}
+          noteFinal+=tr+' ';
+        }else{interim=tr;}
+      }
+      S.noteText=(noteFinal+interim).trim();
+      $('noteTranscript').textContent=S.noteText||'Listening...';
+      $('noteTranscript').style.fontStyle=S.noteText?'normal':'italic';
     }
-    S.noteText=(finalText+interim).trim();
-    $('noteTranscript').textContent=S.noteText||'Listening...';
-    $('noteTranscript').style.fontStyle=S.noteText?'normal':'italic';
   };
-  noteRecog.onend=function(){if(S.mode==='noting'){setTimeout(function(){if(S.mode==='noting'&&noteRecog){try{noteRecog.start();}catch(e){startNoteListen();}}},150);}};
-  noteRecog.onerror=function(e){if(e.error!=='aborted'&&S.mode==='noting'){setTimeout(function(){if(S.mode==='noting')startNoteListen();},400);}};
-  try{noteRecog.start();}catch(e){}
+
+  recognizer.onend=function(){
+    // Always restart if not idle
+    if(recMode!=='idle'){
+      setTimeout(function(){
+        if(recMode!=='idle'){try{recognizer.start();}catch(e){recognizer=null;ensureRecognizer();try{recognizer.start();}catch(ex){}}}
+      },200);
+    }
+  };
+
+  recognizer.onerror=function(e){
+    if(e.error!=='aborted'&&recMode!=='idle'){
+      setTimeout(function(){
+        if(recMode!=='idle'){recognizer=null;ensureRecognizer();try{recognizer.start();}catch(ex){}}
+      },400);
+    }
+  };
 }
-function stopNoteListen(){$('voiceBar').className='voice-bar';if(noteRecog){try{noteRecog.stop();}catch(e){}noteRecog=null;}}
-function stopAll(){stopAudio();stopCommands();stopNoteListen();}
+
+function setRecMode(mode){
+  recMode=mode;
+  if(mode==='commands'){
+    $('voiceBar').className='voice-bar listening';$('voiceBar').textContent='🎙 Listening for "hold on"';
+  }else if(mode==='noting'){
+    $('voiceBar').className='voice-bar recording';$('voiceBar').textContent='🔴 Recording note — "done" to save, "continue" to skip';
+    noteFinal='';S.noteText='';
+  }else{
+    $('voiceBar').className='voice-bar';
+  }
+}
+
+function startListening(mode){
+  setRecMode(mode);
+  ensureRecognizer();
+  try{recognizer.start();}catch(e){/* already running, that's fine */}
+  // Watchdog: recreate recognizer every 25s to beat Safari timeout
+  if(watchdog)clearInterval(watchdog);
+  if(mode!=='idle'){
+    watchdog=setInterval(function(){
+      if(recMode!=='idle'){
+        var m=recMode;
+        try{recognizer.stop();}catch(e){}
+        recognizer=null;
+        setTimeout(function(){ensureRecognizer();setRecMode(m);try{recognizer.start();}catch(e){}},300);
+      }else{clearInterval(watchdog);watchdog=null;}
+    },25000);
+  }
+}
+
+function stopListening(){
+  recMode='idle';setRecMode('idle');
+  if(watchdog){clearInterval(watchdog);watchdog=null;}
+  if(recognizer){try{recognizer.stop();}catch(e){}recognizer=null;}
+}
+
+function stopAll(){stopAudio();stopListening();}
 
 // DOC VIEW
 function renderDocView(){
@@ -232,7 +273,7 @@ function renderDocView(){
   });
 }
 function scrollToChunk(i){var el=$('docView').children[i];if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
-function jumpTo(i){if(i<0)i=0;if(i>=S.chunks.length)i=S.chunks.length-1;stopAudio();S.chunkIdx=i;S.mode='reading';showPanel('doc');updateActions();updateProgress();renderDocView();scrollToChunk(i);startCommands();playChunk(i);}
+function jumpTo(i){if(i<0)i=0;if(i>=S.chunks.length)i=S.chunks.length-1;stopAudio();S.chunkIdx=i;S.mode='reading';showPanel('doc');updateActions();updateProgress();renderDocView();scrollToChunk(i);startListening('commands');playChunk(i);}
 function nextSection(){for(var i=S.chunkIdx+1;i<S.chunks.length;i++){if(S.isHeading[i]){jumpTo(i);return;}}jumpTo(S.chunks.length-1);}
 function prevSection(){for(var i=S.chunkIdx-1;i>=0;i--){if(S.isHeading[i]){jumpTo(i);return;}}jumpTo(0);}
 
@@ -248,12 +289,11 @@ function startReading(){
   $('progressBar').style.display='block';$('progressPct').style.display='inline';
   updateNotesBadge();updateProgress();updateActions();
   prefetch(0);prefetch(1);
-  setTimeout(function(){startCommands();playChunk(0);},300);
+  setTimeout(function(){startListening('commands');playChunk(0);},300);
 }
 
 function doHoldOn(){
-  // "hold on" = pause + immediately start listening for note
-  stopAudio();stopCommands();
+  stopAudio();
   S.mode='noting';S.noteText='';
   S.currentSearch=getSearchPhrase(S.chunks[S.chunkIdx]||'');
   $('noteTranscript').textContent='Listening...';
@@ -261,23 +301,21 @@ function doHoldOn(){
   $('notingAnchor').textContent=S.currentSearch;
   $('notingContext').textContent=S.chunks[S.chunkIdx]||'';
   showPanel('noting');updateActions();
-  startNoteListen();
+  setRecMode('noting');
 }
 
 function doSaveAndResume(override){
-  stopNoteListen();
   var text=(override||S.noteText||'').trim();
   if(text){S.notes.push({id:Date.now(),search:S.currentSearch,note:text,chunkIndex:S.chunkIdx});updateNotesBadge();}
   S.noteText='';S.mode='reading';
   showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();
-  startCommands();playChunk(S.chunkIdx);
+  setRecMode('commands');playChunk(S.chunkIdx);
 }
 
 function doSkipAndResume(){
-  stopNoteListen();
   S.noteText='';S.mode='reading';
   showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();
-  startCommands();playChunk(S.chunkIdx);
+  setRecMode('commands');playChunk(S.chunkIdx);
 }
 
 function doEndReview(){stopAll();S.mode='review';showPanel('review');updateReview();updateActions();}
