@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Walk the Doc</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fafaf8;--bg2:#f0efec;--tx:#1a1a19;--tx2:#6b6a65;--tx3:#9c9b95;--acc:#1d9e75;--acc2:#e1f5ee;--acct:#085041;--rec:#d85a30;--rec2:#faece7;--infot:#0c447c;--bdr:#d3d1c7;--bdr2:#b4b2a9;--hi:#fff8c5;--rad:10px;--rad2:14px}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1a;--bg2:#2a2a27;--tx:#e8e7e3;--tx2:#9c9b95;--tx3:#6b6a65;--acc:#5dcaa5;--acc2:#04342c;--acct:#9fe1cb;--rec:#f0997b;--rec2:#4a1b0c;--infot:#b5d4f4;--bdr:#444441;--bdr2:#5f5e5a;--hi:#3d3a20}}
+body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100dvh;display:flex;flex-direction:column;-webkit-text-size-adjust:100%}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--bdr);position:sticky;top:0;background:var(--bg);z-index:10}
+.header h1{font-size:17px;font-weight:600;letter-spacing:-0.3px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--acc2);color:var(--acct)}
+.settings-btn{width:36px;height:36px;border:none;background:none;color:var(--tx2);font-size:20px;cursor:pointer;border-radius:8px}
+.progress-bar{height:3px;background:var(--bg2);position:sticky;top:49px;z-index:9}
+.progress-fill{height:100%;transition:width 0.4s ease;border-radius:0 2px 2px 0;background:var(--acc)}
+.main{flex:1;padding:16px;padding-bottom:240px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.panel{display:none;flex-direction:column;gap:16px}
+.panel.active{display:flex}
+textarea{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:14px;font-size:15px;line-height:1.65;background:var(--bg);color:var(--tx);resize:vertical;font-family:inherit;min-height:200px}
+textarea:focus{outline:none;border-color:var(--bdr2)}
+input[type=text],input[type=password]{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;font-size:15px;background:var(--bg);color:var(--tx);font-family:inherit}
+input:focus{outline:none;border-color:var(--bdr2)}
+select{width:100%;border:0.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;font-size:15px;background:var(--bg);color:var(--tx);font-family:inherit;-webkit-appearance:none;appearance:none}
+.label{font-size:13px;color:var(--tx2);margin-bottom:4px}
+.hint{font-size:12px;color:var(--tx3)}
+.meta{font-size:13px;color:var(--tx3)}
+.doc-view{display:flex;flex-direction:column;gap:2px}
+.doc-chunk{padding:10px 12px;border-radius:8px;font-size:14px;line-height:1.65;color:var(--tx2);cursor:pointer;transition:background 0.2s,color 0.2s;border-left:3px solid transparent}
+.doc-chunk:active{opacity:0.7}
+.doc-chunk.current{background:var(--hi);color:var(--tx);border-left-color:var(--acc)}
+.doc-chunk.played{color:var(--tx3);border-left-color:var(--bg2)}
+.doc-chunk.heading{font-weight:600;font-size:15px;color:var(--tx);margin-top:8px}
+.doc-chunk.heading.played{color:var(--tx2)}
+.note-card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rad2);padding:14px;margin-top:12px}
+.note-num{font-size:11px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.note-search{font-size:13px;color:var(--infot);margin:6px 0}
+.note-text{font-size:14px;line-height:1.6;color:var(--tx)}
+.note-del{border:none;background:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:4px;float:right;line-height:1}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:var(--bg);border-top:0.5px solid var(--bdr);z-index:10}
+.btn{width:100%;padding:14px;font-size:16px;font-weight:500;border:none;border-radius:var(--rad2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform 0.1s}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--acc);color:#fff}
+.btn-outline{background:transparent;border:0.5px solid var(--bdr);color:var(--tx)}
+.btn-sm{padding:10px 12px;font-size:13px}
+.btn-row{display:flex;gap:8px}
+.btn-row .btn{flex:1}
+.nav-row{display:flex;gap:6px;margin-bottom:8px}
+.nav-row .btn{flex:1;padding:10px;font-size:13px}
+.big-btn{width:100%;border:none;border-radius:var(--rad2);cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:transform 0.1s,background 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.big-btn:active{transform:scale(0.96)}
+.big-btn.reading{background:var(--bg2);color:var(--tx);padding:28px 20px}
+.big-btn.noting{background:var(--rec);color:#fff;padding:28px 20px}
+.big-btn .big-icon{font-size:36px}
+.big-btn .big-label{font-size:16px;font-weight:500}
+.big-btn .big-hint{font-size:12px;opacity:0.7}
+.note-live{background:var(--rec2);border-radius:var(--rad);padding:10px 14px;font-size:14px;line-height:1.6;min-height:40px;margin-bottom:8px;color:var(--tx)}
+.speed-control{display:flex;align-items:center;gap:10px;padding:8px 0}
+.speed-control label{font-size:13px;color:var(--tx2);white-space:nowrap}
+.speed-control input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--bdr);border-radius:2px;outline:none}
+.speed-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer}
+.speed-val{font-size:13px;color:var(--tx2);min-width:36px;text-align:right}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.mic-pulse{animation:pulse 1.2s infinite}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Walk the Doc</h1>
+  <div class="hdr-right">
+    <span class="badge" id="noteCount" style="display:none">0</span>
+    <span class="meta" id="progressPct" style="display:none">0%</span>
+    <button class="settings-btn" onclick="showPanel('setup')">⚙</button>
+  </div>
+</div>
+<div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill" style="width:0"></div></div>
+
+<div class="main" id="mainArea">
+  <div class="panel active" id="panelSetup">
+    <div><p style="font-size:15px;margin-bottom:4px;font-weight:500">Setup</p><p class="hint">One-button document review. Tap to pause and note, tap to resume.</p></div>
+    <div><p class="label">ElevenLabs API key</p><input type="password" id="apiKeyInput" placeholder="xi-..." autocomplete="off"><p class="hint" style="margin-top:6px">Stored on this device only.</p></div>
+    <div><p class="label">Voice</p><select id="voiceSelect"><option value="">Load voices first...</option></select></div>
+    <button class="btn btn-outline" onclick="loadVoices()" id="loadVoicesBtn">Load voices</button>
+    <div><p class="label">Reading speed</p><div class="speed-control"><label>1.0×</label><input type="range" id="speedSlider" min="1.0" max="2.0" step="0.05" value="1.3"><label>2.0×</label><span class="speed-val" id="speedVal">1.30×</span></div></div>
+    <button class="btn btn-primary" onclick="saveSettingsAndContinue()" id="saveSettingsBtn" disabled>Save &amp; continue</button>
+    <p class="hint" id="setupError" style="color:var(--rec);display:none"></p>
+  </div>
+
+  <div class="panel" id="panelInput">
+    <div><p class="label">Paste your document</p></div>
+    <textarea id="docInput" placeholder="Paste your outline, draft, or any document here..."></textarea>
+    <p class="meta" id="wordCount"></p>
+    <div class="hint" style="text-align:center;margin-top:4px">Tap the big button to pause and dictate notes. Tap any section to jump.</div>
+  </div>
+
+  <div class="panel" id="panelDoc">
+    <div class="doc-view" id="docView"></div>
+  </div>
+
+  <div class="panel" id="panelReview">
+    <div style="display:flex;align-items:center;justify-content:space-between"><p style="font-size:15px;font-weight:500" id="reviewTitle">No notes</p><button id="copyTopBtn" style="padding:6px 14px;font-size:13px;border:0.5px solid var(--bdr);border-radius:8px;background:none;cursor:pointer;color:var(--tx);display:none" onclick="copyNotes()">Copy all</button></div>
+    <div id="notesList"></div>
+  </div>
+</div>
+
+<div class="bottom-bar" id="bottomBar"><div id="actionArea"></div></div>
+
+<script>
+var S={mode:'setup',apiKey:'',voiceId:'',speed:1.3,docText:'',chunks:[],chunkIdx:0,notes:[],currentSearch:'',noteText:'',isHeading:[]};
+var audioEl=new Audio(),audioCache={},pfid=0,noteRecog=null,noteFinal='';
+function $(id){return document.getElementById(id);}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function loadS(){try{var k=localStorage.getItem('wtd_key'),v=localStorage.getItem('wtd_voice'),s=localStorage.getItem('wtd_speed');if(k)S.apiKey=k;if(v)S.voiceId=v;if(s)S.speed=parseFloat(s);}catch(e){}}
+function saveS(){try{localStorage.setItem('wtd_key',S.apiKey);localStorage.setItem('wtd_voice',S.voiceId);localStorage.setItem('wtd_speed',S.speed);}catch(e){}}
+
+function chunkDoc(text){
+  var lines=text.split(/\n/),result=[],heads=[],cur='';
+  for(var i=0;i<lines.length;i++){
+    var t=lines[i].trim();
+    if(!t){if(cur.trim()){result.push(cur.trim());heads.push(false);cur='';}continue;}
+    if(/^#{1,4}\s/.test(t)){if(cur.trim()){result.push(cur.trim());heads.push(false);}result.push(t.replace(/^#+\s*/,''));heads.push(true);cur='';continue;}
+    cur+=' '+t;
+    if(cur.length>220){var sn=cur.match(/[^.!?]+[.!?]+/g);if(sn&&sn.length>1){var m=Math.ceil(sn.length/2);result.push(sn.slice(0,m).join('').trim());heads.push(false);cur=sn.slice(m).join('');}else{result.push(cur.trim());heads.push(false);cur='';}}
+  }
+  if(cur.trim()){result.push(cur.trim());heads.push(false);}
+  S.isHeading=heads;return result.filter(function(c){return c.length>0;});
+}
+function getSearchPhrase(t){var w=t.replace(/[#*_\->\[\](){}]/g,'').trim().split(/\s+/).filter(Boolean);if(w.length<=7)return w.join(' ');var m=Math.max(0,Math.floor(w.length/2)-3);return w.slice(m,m+7).join(' ');}
+
+// ELEVENLABS
+async function fetchVoices(){
+  var key=$('apiKeyInput').value.trim();if(!key){showErr('Enter API key first');return;}
+  $('loadVoicesBtn').textContent='Loading...';
+  try{var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':key}});if(!res.ok)throw new Error('Bad key or network');var data=await res.json(),sel=$('voiceSelect');sel.innerHTML='';
+  data.voices.forEach(function(v){var o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(o);});
+  if(data.voices.length>0){sel.value=S.voiceId||data.voices[0].voice_id;$('saveSettingsBtn').disabled=false;}hideErr();}catch(e){showErr('Failed: '+e.message);}
+  $('loadVoicesBtn').textContent='Load voices';
+}
+async function genAudio(text){
+  var res=await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+S.voiceId+'?output_format=mp3_44100_128',{method:'POST',headers:{'xi-api-key':S.apiKey,'Content-Type':'application/json'},
+  body:JSON.stringify({text:text,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.5,similarity_boost:0.75}})});
+  if(!res.ok)throw new Error('API '+res.status);return URL.createObjectURL(await res.blob());
+}
+async function prefetch(i){if(i>=S.chunks.length||audioCache[i])return;var id=++pfid;try{var u=await genAudio(S.chunks[i]);if(pfid===id)audioCache[i]=u;}catch(e){}}
+
+// PLAYBACK
+async function playChunk(idx){
+  if(idx>=S.chunks.length){S.mode='review';showPanel('review');updateReview();updateActions();return;}
+  S.chunkIdx=idx;updateProgress();renderDocView();scrollToChunk(idx);
+  var url=audioCache[idx];
+  if(!url){try{url=await genAudio(S.chunks[idx]);}catch(e){setTimeout(function(){playChunk(idx+1);},300);return;}audioCache[idx]=url;}
+  prefetch(idx+1);prefetch(idx+2);
+  audioEl.src=url;
+  audioEl.onended=function(){if(S.mode==='reading')playChunk(idx+1);};
+  audioEl.onerror=function(){if(S.mode==='reading')playChunk(idx+1);};
+  audioEl.volume=0.7;
+  audioEl.playbackRate=S.speed;
+  try{await audioEl.play();}catch(e){}
+}
+function stopAudio(){audioEl.pause();audioEl.onended=null;audioEl.currentTime=0;}
+
+// NOTE DICTATION — only runs when audio is stopped
+function getSR(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
+
+function startNoteMic(){
+  var SR=getSR();if(!SR)return;
+  stopNoteMic();
+  noteFinal='';S.noteText='';
+  noteRecog=new SR();noteRecog.continuous=true;noteRecog.interimResults=true;noteRecog.lang='en-US';
+  noteRecog.onresult=function(e){
+    var interim='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){noteFinal+=e.results[i][0].transcript+' ';}
+      else{interim=e.results[i][0].transcript;}
+    }
+    S.noteText=(noteFinal+interim).trim();
+    var el=$('noteLive');
+    if(el){el.textContent=S.noteText||'Listening...';}
+  };
+  noteRecog.onend=function(){if(S.mode==='noting'&&noteRecog){setTimeout(function(){if(S.mode==='noting'){try{noteRecog.start();}catch(e){}}},200);}};
+  noteRecog.onerror=function(e){if(e.error!=='aborted'&&S.mode==='noting'){setTimeout(function(){if(S.mode==='noting'){try{noteRecog.start();}catch(e){}}},400);}};
+  try{noteRecog.start();}catch(e){}
+}
+function stopNoteMic(){if(noteRecog){try{noteRecog.stop();}catch(e){}noteRecog=null;}}
+
+// DOC VIEW
+function renderDocView(){
+  var v=$('docView');v.innerHTML='';
+  S.chunks.forEach(function(c,i){
+    var d=document.createElement('div');
+    d.className='doc-chunk'+(i===S.chunkIdx?' current':'')+(i<S.chunkIdx?' played':'')+(S.isHeading[i]?' heading':'');
+    d.textContent=c;d.onclick=function(){jumpTo(i);};v.appendChild(d);
+  });
+}
+function scrollToChunk(i){var el=$('docView').children[i];if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+function jumpTo(i){if(i<0)i=0;if(i>=S.chunks.length)i=S.chunks.length-1;stopAudio();stopNoteMic();S.chunkIdx=i;S.mode='reading';showPanel('doc');updateActions();updateProgress();renderDocView();scrollToChunk(i);playChunk(i);}
+function nextSection(){for(var i=S.chunkIdx+1;i<S.chunks.length;i++){if(S.isHeading[i]){jumpTo(i);return;}}jumpTo(S.chunks.length-1);}
+function prevSection(){for(var i=S.chunkIdx-1;i>=0;i--){if(S.isHeading[i]){jumpTo(i);return;}}jumpTo(0);}
+
+// === THE BIG BUTTON ===
+function bigButtonTap(){
+  if(S.mode==='reading'){
+    // PAUSE: stop audio, start mic
+    stopAudio();
+    S.mode='noting';
+    S.currentSearch=getSearchPhrase(S.chunks[S.chunkIdx]||'');
+    updateActions();
+    startNoteMic();
+  }else if(S.mode==='noting'){
+    // RESUME: stop mic, save note if any, start audio
+    stopNoteMic();
+    var text=(S.noteText||'').trim();
+    text=text.replace(/\b(done|save|got it|save note|that's it|continue)\s*$/i,'').trim();
+    if(text){
+      S.notes.push({id:Date.now(),search:S.currentSearch,note:text,chunkIndex:S.chunkIdx});
+      updateNotesBadge();
+    }
+    S.noteText='';S.mode='reading';
+    showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);
+    updateActions();
+    playChunk(S.chunkIdx);
+  }
+}
+
+function startReading(){
+  var text=$('docInput').value.trim();if(!text)return;
+  S.docText=text;S.chunks=chunkDoc(text);S.chunkIdx=0;S.notes=[];audioCache={};
+  if(!S.chunks.length)return;
+  S.mode='reading';showPanel('doc');renderDocView();
+  $('progressBar').style.display='block';$('progressPct').style.display='inline';
+  updateNotesBadge();updateProgress();updateActions();
+  prefetch(0);prefetch(1);
+  setTimeout(function(){playChunk(0);},300);
+}
+
+function doEndReview(){stopAudio();stopNoteMic();S.mode='review';showPanel('review');updateReview();updateActions();}
+function backToDoc(){S.mode='reading';showPanel('doc');renderDocView();scrollToChunk(S.chunkIdx);updateActions();playChunk(S.chunkIdx);}
+function doNewDoc(){stopAudio();stopNoteMic();S.mode='input';S.docText='';S.chunks=[];S.chunkIdx=0;S.notes=[];audioCache={};$('docInput').value='';$('progressBar').style.display='none';$('progressPct').style.display='none';updateNotesBadge();showPanel('input');updateActions();}
+
+// NOTES
+function deleteNote(id){S.notes=S.notes.filter(function(n){return n.id!==id;});updateReview();updateNotesBadge();}
+function copyNotes(){
+  var t=S.notes.map(function(n,i){return'NOTE '+(i+1)+'\nSEARCH: '+n.search+'\nNOTE: '+n.note+'\n';}).join('\n---\n\n');
+  navigator.clipboard.writeText(t).then(function(){
+    ['copyTopBtn','copyMainBtn'].forEach(function(id){var b=$(id);if(b){b.textContent='✓ Copied!';setTimeout(function(){b.textContent=id==='copyTopBtn'?'Copy all':'📋 Copy all notes';},2000);}});
+  });
+}
+
+// UI
+function showErr(m){$('setupError').textContent=m;$('setupError').style.display='block';}
+function hideErr(){$('setupError').style.display='none';}
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  var map={setup:'panelSetup',input:'panelInput',doc:'panelDoc',review:'panelReview'};
+  var el=$(map[name]);if(el)el.classList.add('active');
+}
+function updateProgress(){var p=S.chunks.length?Math.round((S.chunkIdx/S.chunks.length)*100):0;$('progressFill').style.width=p+'%';$('progressPct').textContent=p+'%';}
+function updateNotesBadge(){var el=$('noteCount');if(S.notes.length>0){el.style.display='inline';el.textContent=S.notes.length+' note'+(S.notes.length!==1?'s':'');}else el.style.display='none';}
+function updateReview(){
+  var list=$('notesList'),title=$('reviewTitle'),cb=$('copyTopBtn');
+  if(!S.notes.length){title.textContent='No notes this session';if(cb)cb.style.display='none';list.innerHTML='';return;}
+  title.textContent=S.notes.length+' note'+(S.notes.length!==1?'s':'')+' ready';if(cb)cb.style.display='inline-block';
+  list.innerHTML=S.notes.map(function(n,i){return'<div class="note-card"><button class="note-del" onclick="deleteNote('+n.id+')">×</button><p class="note-num">Note '+(i+1)+'</p><p class="note-search">🔍 '+esc(n.search)+'</p><p class="note-text">'+esc(n.note)+'</p></div>';}).join('');
+}
+
+function updateActions(){
+  var a=$('actionArea'),h='';
+  if(S.mode==='setup'){a.innerHTML='';return;}
+  if(S.mode==='input'){h='<button class="btn btn-primary" onclick="startReading()">▶ Start review</button>';}
+  else if(S.mode==='reading'){
+    h='<div class="nav-row"><button class="btn btn-outline btn-sm" onclick="prevSection()">⏮</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx-1)">◀</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx+1)">▶</button><button class="btn btn-outline btn-sm" onclick="nextSection()">⏭</button></div>';
+    h+='<button class="big-btn reading" onclick="bigButtonTap()"><span class="big-icon">⏸</span><span class="big-label">Tap to pause &amp; note</span></button>';
+    h+='<button class="btn btn-outline btn-sm" onclick="doEndReview()" style="margin-top:8px">🏁 End review</button>';
+  }
+  else if(S.mode==='noting'){
+    h='<div class="nav-row"><button class="btn btn-outline btn-sm" onclick="prevSection()">⏮</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx-1)">◀</button><button class="btn btn-outline btn-sm" onclick="jumpTo(S.chunkIdx+1)">▶</button><button class="btn btn-outline btn-sm" onclick="nextSection()">⏭</button></div>';
+    h+='<div class="note-live" id="noteLive">Listening...</div>';
+    h+='<button class="big-btn noting mic-pulse" onclick="bigButtonTap()"><span class="big-icon">🎙</span><span class="big-label">Tap to save &amp; resume</span><span class="big-hint">No note? Tap anyway to continue</span></button>';
+    h+='<button class="btn btn-outline btn-sm" onclick="doEndReview()" style="margin-top:8px">🏁 End review</button>';
+  }
+  else if(S.mode==='review'){
+    if(S.notes.length)h+='<button class="btn btn-primary" onclick="copyNotes()" style="margin-bottom:8px" id="copyMainBtn">📋 Copy all notes</button>';
+    if(S.chunks.length)h+='<button class="btn btn-outline" onclick="backToDoc()" style="margin-bottom:8px">← Back to document</button>';
+    h+='<button class="btn btn-outline" onclick="doNewDoc()">📄 New document</button>';
+  }
+  a.innerHTML=h;
+}
+
+function loadVoices(){fetchVoices();}
+function saveSettingsAndContinue(){
+  var key=$('apiKeyInput').value.trim(),voice=$('voiceSelect').value,speed=parseFloat($('speedSlider').value);
+  if(!key||!voice){showErr('Need API key and voice');return;}
+  S.apiKey=key;S.voiceId=voice;S.speed=speed;saveS();S.mode='input';showPanel('input');updateActions();
+}
+$('docInput').addEventListener('input',function(){var w=this.value.trim().split(/\s+/).filter(Boolean).length;$('wordCount').textContent=w>0?w.toLocaleString()+' words — ~'+Math.ceil(w/140)+' min':'';});
+$('speedSlider').addEventListener('input',function(){$('speedVal').textContent=parseFloat(this.value).toFixed(2)+'×';});
+
+loadS();
+if(S.apiKey){
+  $('apiKeyInput').value=S.apiKey;$('speedSlider').value=S.speed;$('speedVal').textContent=S.speed.toFixed(2)+'×';
+  setTimeout(async function(){
+    try{var res=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':S.apiKey}});
+    if(res.ok){var data=await res.json(),sel=$('voiceSelect');sel.innerHTML='';
+    data.voices.forEach(function(v){var o=document.createElement('option');o.value=v.voice_id;o.textContent=v.name+(v.labels&&v.labels.accent?' ('+v.labels.accent+')':'');sel.appendChild(o);});
+    if(S.voiceId)sel.value=S.voiceId;$('saveSettingsBtn').disabled=false;
+    if(S.voiceId&&sel.value){S.mode='input';showPanel('input');updateActions();}}}catch(e){}
+  },100);
+}
+updateActions();
+</script>
+</body>
+</html>
